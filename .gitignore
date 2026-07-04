@@ -1,0 +1,26 @@
+# Environment variables (contains API keys)
+.env
+
+# AI context files (user-specific)
+.ai-context/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+temp/
