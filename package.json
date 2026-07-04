@@ -22,12 +22,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/multi-ai-context.git"
+    "url": "https://github.com/heyuxuan0209/multi-ai-context.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/multi-ai-context/issues"
+    "url": "https://github.com/heyuxuan0209/multi-ai-context/issues"
   },
-  "homepage": "https://github.com/yourusername/multi-ai-context#readme",
+  "homepage": "https://github.com/heyuxuan0209/multi-ai-context#readme",
   "dependencies": {
     "axios": "^1.6.0",
     "dotenv": "^16.3.1"
