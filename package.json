@@ -1,7 +1,7 @@
 {
   "name": "multi-ai-context",
   "version": "1.0.0",
-  "description": "A terminal-based tool for multi-AI collaboration with automatic context and decision management",
+  "description": "MindForge: a multi-role AI platform for complex product work, shared context, and decision handoff",
   "main": "src/cli.js",
   "scripts": {
     "cli": "node src/cli.js",
@@ -9,25 +9,28 @@
   },
   "keywords": [
     "ai",
-    "multi-agent",
+    "multi-role-ai",
+    "mindforge",
     "context-management",
     "claude",
     "gpt",
     "collaboration",
     "terminal",
     "cli",
-    "decision-tracking"
+    "decision-tracking",
+    "product-development",
+    "handoff"
   ],
   "author": "",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/heyuxuan0209/multi-ai-context.git"
+    "url": "https://github.com/heyuxuan0209/mindforge.git"
   },
   "bugs": {
-    "url": "https://github.com/heyuxuan0209/multi-ai-context/issues"
+    "url": "https://github.com/heyuxuan0209/mindforge/issues"
   },
-  "homepage": "https://github.com/heyuxuan0209/multi-ai-context#readme",
+  "homepage": "https://github.com/heyuxuan0209/mindforge#readme",
   "dependencies": {
     "axios": "^1.6.0",
     "dotenv": "^16.3.1"

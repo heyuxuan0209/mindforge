@@ -1,4 +1,12 @@
-# Multi-AI Context Manager
+# MindForge
+
+Turn vague ideas into clear decisions, better designs, and stronger execution.
+
+把模糊想法逐步锻造成清晰决策、更优设计与更稳执行。
+
+MindForge is currently implemented in this repository as a terminal-based workflow for multi-role AI collaboration, while the product direction evolves toward a broader platform.
+
+MindForge 当前在这个仓库中先以终端工作流的形式实现，用于多角色 AI 协作，产品定位会逐步演进为更完整的平台。
 
 [English](#english) | [中文](#chinese)
 
@@ -7,7 +15,7 @@
 <a name="english"></a>
 ## English
 
-A terminal-based tool for multi-AI collaboration with automatic context and decision management.
+MindForge is a multi-role AI platform for complex product work. It helps users turn vague goals into clear decisions, then continue through design, development, testing, and iteration with shared context across AI roles.
 
 ### Why Multi-Agent Collaboration?
 
@@ -40,8 +48,8 @@ The goal is therefore:
 #### Installation
 
 ```bash
-git clone https://github.com/yourusername/multi-ai-context.git
-cd multi-ai-context
+git clone https://github.com/yourusername/mindforge.git
+cd mindforge
 npm install
 ```
 
@@ -67,7 +75,7 @@ npm run cli
 
 Or add an alias for quick access (optional):
 ```bash
-echo 'alias ai="cd /path/to/multi-ai-context && npm run cli"' >> ~/.zshrc
+echo 'alias ai="cd /path/to/mindforge && npm run cli"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
@@ -132,7 +140,7 @@ Then simply type `ai` to start.
 ### 📁 Project Structure
 
 ```
-multi-ai-context/
+mindforge/
 ├── .ai-context/          # Auto-generated context directory
 │   ├── brief.md         # Project background
 │   ├── decisions.md     # Decision log
@@ -279,7 +287,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 <a name="chinese"></a>
 ## 中文
 
-多 AI 协作的终端工具，自动管理项目上下文和决策文档。
+MindForge 是一个面向复杂产品工作的多角色 AI 协作平台，帮助用户把模糊目标逐步变成清晰决策，并在共享上下文的基础上继续推进设计、开发、测试与迭代。
 
 ### 为什么做多 Agent 协作？
 
@@ -312,8 +320,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 #### 安装
 
 ```bash
-git clone https://github.com/yourusername/multi-ai-context.git
-cd multi-ai-context
+git clone https://github.com/yourusername/mindforge.git
+cd mindforge
 npm install
 ```
 
@@ -339,7 +347,7 @@ npm run cli
 
 或者添加快捷命令（可选）：
 ```bash
-echo 'alias ai="cd /path/to/multi-ai-context && npm run cli"' >> ~/.zshrc
+echo 'alias ai="cd /path/to/mindforge && npm run cli"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
@@ -404,7 +412,7 @@ source ~/.zshrc
 ### 📁 项目结构
 
 ```
-multi-ai-context/
+mindforge/
 ├── .ai-context/          # 自动生成的上下文目录
 │   ├── brief.md         # 项目背景
 │   ├── decisions.md     # 决策记录
