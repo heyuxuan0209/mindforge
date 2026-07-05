@@ -125,7 +125,7 @@ A: Google's Gemini API may be restricted in your region. Solutions:
 
 A:
 ```bash
-cd /path/to/multi-ai-context
+cd /path/to/mindforge
 git pull origin main
 npm install
 ```
@@ -335,7 +335,7 @@ A: Currently designed for interactive use. Programmatic API is planned for futur
 
 答：
 ```bash
-cd /path/to/multi-ai-context
+cd /path/to/mindforge
 git pull origin main
 npm install
 ```
@@ -424,6 +424,6 @@ npm install
 
 ---
 
-还有其他问题？请在 [GitHub Issues](https://github.com/yourusername/multi-ai-context/issues) 提问！
+还有其他问题？请在 [GitHub Issues](https://github.com/yourusername/mindforge/issues) 提问！
 
-Have more questions? Ask in [GitHub Issues](https://github.com/yourusername/multi-ai-context/issues)!
+Have more questions? Ask in [GitHub Issues](https://github.com/yourusername/mindforge/issues)!

@@ -7,7 +7,7 @@
 1. 登录 GitHub
 2. 点击右上角 "+" → "New repository"
 3. 填写仓库信息：
-   - **Repository name**: `multi-ai-context`
+   - **Repository name**: `mindforge`
    - **Description**: A terminal-based tool for multi-AI collaboration
    - **Public** (推荐) 或 **Private**
    - **不要** 勾选 "Initialize this repository with a README"
@@ -17,10 +17,10 @@
 在项目目录执行：
 
 ```bash
-cd /Users/heyuxuan/multi-ai-context
+cd /Users/heyuxuan/mindforge
 
 # 关联远程仓库（替换 yourusername 为你的 GitHub 用户名）
-git remote add origin https://github.com/yourusername/multi-ai-context.git
+git remote add origin https://github.com/yourusername/mindforge.git
 
 # 推送代码
 git branch -M main
@@ -35,7 +35,7 @@ git push -u origin main
 {
   "repository": {
     "type": "git",
-    "url": "https://github.com/你的用户名/multi-ai-context.git"
+    "url": "https://github.com/你的用户名/mindforge.git"
   }
 }
 ```
@@ -58,8 +58,8 @@ Settings → Features → Discussions
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/multi-ai-context.git
-cd multi-ai-context
+git clone https://github.com/yourusername/mindforge.git
+cd mindforge
 
 # 安装依赖
 npm install

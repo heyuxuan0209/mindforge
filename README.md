@@ -17,11 +17,11 @@ MindForge 当前在这个仓库中先以终端工作流的形式实现，用于�
 
 MindForge is a multi-role AI platform for complex product work. It helps users turn vague goals into clear decisions, then continue through design, development, testing, and iteration with shared context across AI roles.
 
-### Why Multi-Agent Collaboration?
+### Why Multi-Role AI Collaboration?
 
 This project is not about calling several models for novelty. It is about creating a more reliable thinking and decision environment for uncertain work.
 
-Many real projects do not start with a clear task. They start with a vague goal, a concern, or a rough direction. A single agent can too quickly translate that ambiguity into a concrete task and start producing output. Multi-agent collaboration helps turn fuzzy intent into a clearer problem: one agent expands the idea, another challenges whether the understanding is correct, and the user gets a more reviewable path forward.
+Many real projects do not start with a clear task. They start with a vague goal, a concern, or a rough direction. A single agent can too quickly translate that ambiguity into a concrete task and start producing output. Multi-role AI collaboration helps turn fuzzy intent into a clearer problem: one role expands the idea, another challenges whether the understanding is correct, and the user gets a more reviewable path forward.
 
 Single-agent conversations also tend to develop inertia over long sessions. The agent may keep following its earlier assumptions, avoid reopening weak premises, or move toward implementation before the problem is fully understood. A second agent provides an external review loop that can question the plan, expose hidden risks, and prevent a plausible answer from becoming an unchallenged answer.
 
@@ -37,7 +37,7 @@ The goal is therefore:
 
 ### ✨ Features
 
-- 🤖 **Multi-AI Collaboration**: Integrate Claude (Builder) + GPT (Reviewer) for comprehensive solution design
+- 🤖 **Multi-Role AI Collaboration**: Combine Builder, Reviewer, and Challenger roles for stronger solution design
 - 📝 **Automatic Context Management**: Auto-save project background, decisions, and current solutions
 - 💬 **Interactive Terminal**: Easy-to-use command-line interface
 - 🔄 **Conversation History**: All dialogues are automatically saved locally
@@ -289,11 +289,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 MindForge 是一个面向复杂产品工作的多角色 AI 协作平台，帮助用户把模糊目标逐步变成清晰决策，并在共享上下文的基础上继续推进设计、开发、测试与迭代。
 
-### 为什么做多 Agent 协作？
+### 为什么做多角色 AI 协作？
 
-这个项目不是为了“同时调用多个模型”而做多 Agent。它真正要解决的是：在高不确定性的工作里，给用户一个更可靠的思考、交接和决策环境。
+这个项目不是为了“同时调用多个模型”而做多角色 AI 协作。它真正要解决的是：在高不确定性的工作里，给用户一个更可靠的思考、交接和决策环境。
 
-很多真实项目一开始并不是清晰任务，而是一个模糊目标、一个焦虑点、一个大概方向。单一 agent 很容易过早把模糊问题翻译成一个看似明确的任务，然后直接开始产出。多 Agent 协作的价值，是让一个 agent 帮用户展开问题，让另一个 agent 审视这个理解是否偏了，让问题从“模糊想法”逐渐变成“可判断、可执行、可 review 的任务”。
+很多真实项目一开始并不是清晰任务，而是一个模糊目标、一个焦虑点、一个大概方向。单一 agent 很容易过早把模糊问题翻译成一个看似明确的任务，然后直接开始产出。多角色 AI 协作的价值，是让一个角色帮用户展开问题，让另一个角色审视这个理解是否偏了，让问题从“模糊想法”逐渐变成“可判断、可执行、可 review 的任务”。
 
 单一 agent 在长轮次对话里也容易形成惯性：沿着自己前面说过的话继续走，不愿意推翻早期假设，或者在问题还没想清楚时就推动实现。第二个 agent 的意义，不只是换一个模型，而是引入外部视角，对前一个方案进行挑战、审查和纠偏，避免一个“说得通”的方案未经检验就变成默认答案。
 
@@ -309,7 +309,7 @@ MindForge 是一个面向复杂产品工作的多角色 AI 协作平台，帮助
 
 ### ✨ 功能特点
 
-- 🤖 **多 AI 协作**: 集成 Claude（建设者）+ GPT（审查者），全方位设计方案
+- 🤖 **多角色 AI 协作**: 通过建设者、审查者、挑战者等角色共同推进方案
 - 📝 **自动上下文管理**: 自动保存项目背景、决策记录和当前方案
 - 💬 **交互式终端**: 简洁易用的命令行界面
 - 🔄 **对话历史**: 所有对话自动保存在本地

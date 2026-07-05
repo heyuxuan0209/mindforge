@@ -1,5 +1,5 @@
 {
-  "name": "multi-ai-context",
+  "name": "mindforge",
   "version": "1.0.0",
   "description": "MindForge: a multi-role AI platform for complex product work, shared context, and decision handoff",
   "main": "src/cli.js",

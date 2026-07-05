@@ -68,4 +68,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-For detailed changes, see [GitHub Releases](https://github.com/yourusername/multi-ai-context/releases).
+For detailed changes, see [GitHub Releases](https://github.com/yourusername/mindforge/releases).

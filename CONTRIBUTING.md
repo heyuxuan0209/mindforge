@@ -72,8 +72,8 @@ chore: 构建/工具相关
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/multi-ai-context.git
-cd multi-ai-context
+git clone https://github.com/yourusername/mindforge.git
+cd mindforge
 
 # 安装依赖
 npm install
