@@ -26,7 +26,10 @@ class MultiAgentCLI {
     };
 
     this.conversationHistory = [];
+    this.historyPath = path.join(this.contextDir, 'history.json');
     this.currentAgent = 'claude';
+    this.pendingPaste = '';
+    this.pasteTimer = null;
 
     this.rl = readline.createInterface({
       input: process.stdin,
@@ -45,6 +48,7 @@ class MultiAgentCLI {
 
     // 加载已有上下文
     await this.loadContext();
+    await this.loadHistory();
 
     console.log(`
 ╔════════════════════════════════════════════╗
@@ -59,6 +63,9 @@ class MultiAgentCLI {
   /discuss <话题>   - 多 AI 轮流讨论
   /switch <agent>   - 切换默认 AI (claude/codex/gemini)
   /context          - 查看当前项目上下文
+  /decision <内容>  - 记录一条共享决策
+  /record <内容>    - /decision 的别名
+  /handoff [内容]   - 保存交接包；不填内容时自动保存最近对话
   /save <内容>      - 保存决策到文档
   /history          - 查看对话历史
   /clear            - 清空对话历史
@@ -76,15 +83,36 @@ class MultiAgentCLI {
       const briefPath = path.join(this.contextDir, 'brief.md');
       const decisionsPath = path.join(this.contextDir, 'decisions.md');
       const currentPath = path.join(this.contextDir, 'current.md');
+      const handoffPath = path.join(this.contextDir, 'handoff.md');
+      const reviewPath = path.join(this.contextDir, 'review.md');
+      const memoryPath = path.join(this.contextDir, 'memory.md');
+      const statusPath = path.join(this.contextDir, 'status.md');
 
       this.context.brief = await fs.readFile(briefPath, 'utf-8').catch(() => '');
       this.context.current = await fs.readFile(currentPath, 'utf-8').catch(() => '');
+      this.context.handoff = await fs.readFile(handoffPath, 'utf-8').catch(() => '');
+      this.context.review = await fs.readFile(reviewPath, 'utf-8').catch(() => '');
+      this.context.memory = await fs.readFile(memoryPath, 'utf-8').catch(() => '');
+      this.context.status = await fs.readFile(statusPath, 'utf-8').catch(() => '');
 
       const decisionsContent = await fs.readFile(decisionsPath, 'utf-8').catch(() => '');
-      this.context.decisions = decisionsContent.split('\n').filter(line => line.trim());
+      this.context.decisions = decisionsContent
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.startsWith('- ') || line.startsWith('['));
 
     } catch (error) {
       // 首次使用，没有上下文文件
+    }
+  }
+
+  async loadHistory() {
+    try {
+      const raw = await fs.readFile(this.historyPath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      this.conversationHistory = Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      this.conversationHistory = [];
     }
   }
 
@@ -92,6 +120,10 @@ class MultiAgentCLI {
     const filePath = path.join(this.contextDir, `${section}.md`);
     await fs.writeFile(filePath, content, 'utf-8');
     console.log(`✅ 已保存到 ${section}.md`);
+  }
+
+  async saveHistory() {
+    await fs.writeFile(this.historyPath, JSON.stringify(this.conversationHistory, null, 2), 'utf-8');
   }
 
   async handleCommand(input) {
@@ -121,8 +153,27 @@ class MultiAgentCLI {
 
     // 默认使用当前 AI
     if (trimmed) {
-      await this.askAgent(this.currentAgent, trimmed);
+      await this.enqueueMessage(trimmed);
     }
+  }
+
+  async enqueueMessage(message) {
+    this.pendingPaste = this.pendingPaste ? `${this.pendingPaste}\n${message}` : message;
+    if (this.pasteTimer) clearTimeout(this.pasteTimer);
+    this.pasteTimer = setTimeout(() => {
+      void this.flushPendingPaste();
+    }, 120);
+  }
+
+  async flushPendingPaste() {
+    if (this.pasteTimer) {
+      clearTimeout(this.pasteTimer);
+      this.pasteTimer = null;
+    }
+    const message = this.pendingPaste.trim();
+    this.pendingPaste = '';
+    if (!message) return;
+    await this.askAgent(this.currentAgent, message);
   }
 
   async askAgent(agentName, message) {
@@ -151,7 +202,7 @@ class MultiAgentCLI {
 
     try {
       const systemPrompt = this.buildSystemPrompt(agentName);
-      const messages = [{ role: 'user', content: message }];
+      const messages = this.buildMessages(message);
       const response = await agent.chat(messages, systemPrompt);
 
       console.log(`\n【${agentName.toUpperCase()} 回复】\n`);
@@ -165,6 +216,7 @@ class MultiAgentCLI {
         user: message,
         response: response
       });
+      await this.saveHistory();
 
       // 自动检测决策并保存
       await this.autoSaveDecisions(response);
@@ -175,40 +227,78 @@ class MultiAgentCLI {
   }
 
   buildSystemPrompt(agentName) {
+    const context = this.buildSharedContext();
     const baseContext = `
 项目背景：
-${this.context.brief || '（暂无）'}
+${context.brief || '（暂无）'}
 
 已做决策：
-${this.context.decisions.join('\n') || '（暂无）'}
+${context.decisions.join('\n') || '（暂无）'}
 
 当前方案：
-${this.context.current || '（暂无）'}
+${context.current || '（暂无）'}
 `;
 
     switch (agentName) {
       case 'claude':
-        return this.claudeAgent.buildSystemPrompt(this.context);
+        return this.claudeAgent.buildSystemPrompt(context);
       case 'codex':
-        return this.codexAgent.buildReviewerPrompt(this.context);
+        return this.codexAgent.buildReviewerPrompt(context, {
+          userMessage: this.buildRecentTranscript(1),
+          previousClaudeResponse: this.getLatestResponse('claude'),
+          recentTranscript: this.buildRecentTranscript(),
+        });
       case 'gemini':
-        return this.geminiAgent.buildChallengerPrompt(this.context);
+        return this.geminiAgent.buildChallengerPrompt(context);
       default:
         return baseContext;
     }
   }
 
-  async autoSaveDecisions(response) {
-    const decisionKeywords = ['决定', '确定', '选择', '采用', '不考虑'];
-    const hasDecision = decisionKeywords.some(kw => response.includes(kw));
+  buildSharedContext() {
+    return {
+      ...this.context,
+      recentTranscript: this.buildRecentTranscript()
+    };
+  }
 
-    if (hasDecision) {
-      console.log('\n💡 检测到决策内容，是否保存? (y/n)');
-      // 简化版：自动保存
-      const timestamp = new Date().toLocaleString();
-      const decision = `[${timestamp}] ${response.substring(0, 200)}...`;
-      this.context.decisions.push(decision);
-      await this.saveContext('decisions', this.context.decisions.join('\n\n'));
+  buildMessages(userMessage) {
+    const transcript = this.buildRecentTranscript();
+    if (!transcript) {
+      return [{ role: 'user', content: userMessage }];
+    }
+
+    return [
+      { role: 'user', content: transcript },
+      { role: 'user', content: userMessage }
+    ];
+  }
+
+  buildRecentTranscript(limit = 6) {
+    const entries = this.conversationHistory.slice(-limit);
+    if (entries.length === 0) return '';
+
+    return entries
+      .map((entry) => {
+        const label = entry.agent.toUpperCase();
+        return `[${label}] 用户: ${entry.user}\n[${label}] 回复: ${entry.response}`;
+      })
+      .join('\n\n');
+  }
+
+  getLatestResponse(agentName) {
+    for (let i = this.conversationHistory.length - 1; i >= 0; i -= 1) {
+      const entry = this.conversationHistory[i];
+      if (entry.agent === agentName && entry.response) {
+        return entry.response;
+      }
+    }
+    return '';
+  }
+
+  async autoSaveDecisions(response) {
+    if (response.includes('/decision')) {
+      console.log('\n💡 如果这是重要决策，请用 /decision <内容> 记录到共享决策文档。');
     }
   }
 
@@ -233,6 +323,19 @@ ${this.context.current || '（暂无）'}
         console.log('项目背景:', this.context.brief || '（暂无）');
         console.log('决策数量:', this.context.decisions.length);
         console.log('当前方案:', this.context.current ? '已有' : '（暂无）');
+        console.log('历史记录:', this.conversationHistory.length);
+        break;
+
+      case 'decision':
+        await this.addDecision(args);
+        break;
+
+      case 'record':
+        await this.addDecision(args);
+        break;
+
+      case 'handoff':
+        await this.saveHandoff(args);
         break;
 
       case 'save':
@@ -251,6 +354,7 @@ ${this.context.current || '（暂无）'}
 
       case 'clear':
         this.conversationHistory = [];
+        await this.saveHistory();
         console.log('✅ 对话历史已清空');
         break;
 
@@ -266,6 +370,70 @@ ${this.context.current || '（暂无）'}
       default:
         console.log(`❌ 未知命令: /${cmd}`);
     }
+  }
+
+  async addDecision(content) {
+    const trimmed = content.trim();
+    if (!trimmed) {
+      console.log('❌ 请输入决策内容，例如: /decision MVP 使用 Express + SQLite');
+      return;
+    }
+
+    const date = new Date().toISOString().slice(0, 10);
+    const line = `- [${date}] ${trimmed}`;
+    this.context.decisions.push(line);
+    await this.saveContext('decisions', this.context.decisions.join('\n'));
+  }
+
+  async saveHandoff(content) {
+    const manual = content.trim();
+    const handoff = manual || this.buildHandoffFromRecentTranscript();
+    if (!handoff.trim()) {
+      console.log('❌ 还没有可保存的对话。请先和 agent 讨论，或使用 /handoff <内容>');
+      return;
+    }
+
+    await this.saveContext('handoff', handoff);
+    this.context.handoff = handoff;
+    console.log('✅ 已保存交接包。现在可以 @codex / @gemini 让下一个 agent 基于它继续。');
+  }
+
+  buildHandoffFromRecentTranscript(limit = 4) {
+    const entries = this.conversationHistory.slice(-limit);
+    if (entries.length === 0) return '';
+
+    const lines = [
+      `# 交接包`,
+      ``,
+      `生成时间: ${new Date().toISOString()}`,
+      `来源: 最近 ${entries.length} 轮对话`,
+      ``,
+      `## 最近讨论`,
+      ``,
+    ];
+
+    entries.forEach((entry, idx) => {
+      const label = entry.agent.toUpperCase();
+      lines.push(
+        `### ${idx + 1}. ${label} - ${entry.timestamp}`,
+        ``,
+        `**用户:**`,
+        entry.user,
+        ``,
+        `**${label} 回复:**`,
+        entry.response,
+        ``,
+      );
+    });
+
+    lines.push(
+      `## 给下一位 agent`,
+      ``,
+      `请基于上面的阶段性讨论继续，不要要求用户重新粘贴上下文。先判断当前方案是否合理，再给出建议或 review。`,
+      ``,
+    );
+
+    return lines.join('\n');
   }
 
   async multiAgentDiscuss(topic) {
@@ -296,6 +464,7 @@ ${this.context.current || '（暂无）'}
     });
 
     this.rl.on('close', () => {
+      void this.flushPendingPaste().catch(() => {});
       console.log('\n👋 再见！');
       process.exit(0);
     });

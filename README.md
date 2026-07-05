@@ -9,6 +9,24 @@
 
 A terminal-based tool for multi-AI collaboration with automatic context and decision management.
 
+### Why Multi-Agent Collaboration?
+
+This project is not about calling several models for novelty. It is about creating a more reliable thinking and decision environment for uncertain work.
+
+Many real projects do not start with a clear task. They start with a vague goal, a concern, or a rough direction. A single agent can too quickly translate that ambiguity into a concrete task and start producing output. Multi-agent collaboration helps turn fuzzy intent into a clearer problem: one agent expands the idea, another challenges whether the understanding is correct, and the user gets a more reviewable path forward.
+
+Single-agent conversations also tend to develop inertia over long sessions. The agent may keep following its earlier assumptions, avoid reopening weak premises, or move toward implementation before the problem is fully understood. A second agent provides an external review loop that can question the plan, expose hidden risks, and prevent a plausible answer from becoming an unchallenged answer.
+
+There is also a human factor: a single assistant often tries to be helpful by agreeing, accelerating, and pushing the user forward. That is useful for clear tasks, but risky for strategy, architecture, product decisions, or debugging. In those cases, thinking clearly before doing quickly matters more. This terminal gives the user a workflow for discussion, handoff, review, and decision capture.
+
+The goal is therefore:
+
+- Clarify vague goals before execution.
+- Separate solution generation from solution review.
+- Break single-agent path dependence and blind spots.
+- Preserve intermediate consensus across model switches and restarts.
+- Record final decisions so future agents can continue from shared context.
+
 ### ✨ Features
 
 - 🤖 **Multi-AI Collaboration**: Integrate Claude (Builder) + GPT (Reviewer) for comprehensive solution design
@@ -72,8 +90,14 @@ Then simply type `ai` to start.
 # View project context
 /context
 
-# Save decision to document
-/save Use 1-year expiration policy for points
+# Save the latest stage discussion for the next agent
+/handoff
+
+# Record a final decision
+/decision Use 1-year expiration policy for points
+
+# Save the current solution body
+/save Use Redis + MySQL dual-write approach
 
 # View conversation history
 /history
@@ -95,13 +119,14 @@ Then simply type `ai` to start.
 > @claude Design a high-concurrency user points system
 
 # 2. Codex reviews the solution
-> @codex Review the design, focus on performance and security
+> /handoff
+> @codex Review the handoff, focus on performance and security
 
 # 3. Claude optimizes based on feedback
 > @claude Optimize the design based on Codex's concurrency concerns
 
 # 4. Save final decision
-> /save Adopt Redis + MySQL dual-write approach, Redis for hot data cache
+> /decision Adopt Redis + MySQL dual-write approach, Redis for hot data cache
 ```
 
 ### 📁 Project Structure
@@ -111,6 +136,8 @@ multi-ai-context/
 ├── .ai-context/          # Auto-generated context directory
 │   ├── brief.md         # Project background
 │   ├── decisions.md     # Decision log
+│   ├── handoff.md       # Stage handoff for the next agent
+│   ├── history.json     # Local conversation history
 │   └── current.md       # Current solution
 ├── src/
 │   ├── cli.js           # CLI main program
@@ -209,11 +236,12 @@ The tool supports various API providers:
 
 ### 💡 Best Practices
 
-1. **Start with Context**: Use `/save` to document project background before starting
+1. **Start with Context**: Use `/save` to document the current solution or project state
 2. **Iterative Design**: Claude designs → Codex reviews → Claude refines
-3. **Decision Tracking**: Immediately save important decisions with `/save`
-4. **Regular Review**: Use `/history` to review past discussions
-5. **Cost Control**: Each message costs API tokens, be mindful of usage
+3. **Handoff Before Review**: Use `/handoff` after a stage discussion so the next agent can review without asking you to paste context again
+4. **Decision Tracking**: Use `/decision` only when a conclusion is actually settled
+5. **Regular Review**: Use `/history` to review past discussions
+6. **Cost Control**: Each message costs API tokens, be mindful of usage
 
 ### 🛠️ Troubleshooting
 
@@ -252,6 +280,24 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 中文
 
 多 AI 协作的终端工具，自动管理项目上下文和决策文档。
+
+### 为什么做多 Agent 协作？
+
+这个项目不是为了“同时调用多个模型”而做多 Agent。它真正要解决的是：在高不确定性的工作里，给用户一个更可靠的思考、交接和决策环境。
+
+很多真实项目一开始并不是清晰任务，而是一个模糊目标、一个焦虑点、一个大概方向。单一 agent 很容易过早把模糊问题翻译成一个看似明确的任务，然后直接开始产出。多 Agent 协作的价值，是让一个 agent 帮用户展开问题，让另一个 agent 审视这个理解是否偏了，让问题从“模糊想法”逐渐变成“可判断、可执行、可 review 的任务”。
+
+单一 agent 在长轮次对话里也容易形成惯性：沿着自己前面说过的话继续走，不愿意推翻早期假设，或者在问题还没想清楚时就推动实现。第二个 agent 的意义，不只是换一个模型，而是引入外部视角，对前一个方案进行挑战、审查和纠偏，避免一个“说得通”的方案未经检验就变成默认答案。
+
+还有一个现实问题：单一助手往往会为了显得有帮助而顺着用户、推动用户快点开始做。对于清晰任务，这很好；但对于产品方向、架构设计、复杂调试和策略判断，先想清楚往往比马上开干更重要。这个终端希望把“讨论、交接、审查、决策沉淀”变成一个稳定流程。
+
+因此，这个工具解决的核心痛点是：
+
+- 把模糊目标逐步澄清，而不是过早执行。
+- 把方案生成和方案审查拆开，避免单一视角。
+- 打破单一 agent 的路径依赖、信息茧房和隐性降质。
+- 在切换模型、重启终端、进入下一阶段时保留上下文。
+- 把阶段性讨论保存成交接包，把最终结论沉淀为决策文档。
 
 ### ✨ 功能特点
 
@@ -316,8 +362,14 @@ source ~/.zshrc
 # 查看项目上下文
 /context
 
-# 保存决策到文档
-/save 采用积分1年过期策略
+# 保存阶段性讨论，交给下一个 agent
+/handoff
+
+# 记录最终决策
+/decision 采用积分1年过期策略
+
+# 保存当前方案正文
+/save 采用 Redis + MySQL 双写方案
 
 # 查看对话历史
 /history
@@ -339,13 +391,14 @@ source ~/.zshrc
 > @claude 设计一个高并发的用户积分系统
 
 # 2. Codex 审查方案
-> @codex 审查上面的设计，关注性能和安全性
+> /handoff
+> @codex 基于交接包审查方案，关注性能和安全性
 
 # 3. Claude 根据反馈优化
 > @claude 针对 Codex 提出的并发问题，优化设计
 
 # 4. 保存最终决策
-> /save 采用 Redis + MySQL 双写方案，Redis 做热数据缓存
+> /decision 采用 Redis + MySQL 双写方案，Redis 做热数据缓存
 ```
 
 ### 📁 项目结构
@@ -355,6 +408,8 @@ multi-ai-context/
 ├── .ai-context/          # 自动生成的上下文目录
 │   ├── brief.md         # 项目背景
 │   ├── decisions.md     # 决策记录
+│   ├── handoff.md       # 给下一个 agent 的阶段交接包
+│   ├── history.json     # 本地对话历史
 │   └── current.md       # 当前方案
 ├── src/
 │   ├── cli.js           # CLI 主程序
@@ -453,11 +508,12 @@ multi-ai-context/
 
 ### 💡 最佳实践
 
-1. **从上下文开始**: 开始前用 `/save` 记录项目背景
+1. **从上下文开始**: 用 `/save` 记录当前方案或项目状态
 2. **迭代设计**: Claude 设计 → Codex 审查 → Claude 优化
-3. **决策追踪**: 重要决策立即用 `/save` 保存
-4. **定期回顾**: 用 `/history` 查看历史讨论
-5. **成本控制**: 每条消息都消耗 API token，注意使用量
+3. **审查前交接**: 阶段讨论后用 `/handoff` 保存交接包，下一位 agent 不需要你重新粘贴上下文
+4. **决策追踪**: 真正拍板后再用 `/decision` 保存最终结论
+5. **定期回顾**: 用 `/history` 查看历史讨论
+6. **成本控制**: 每条消息都消耗 API token，注意使用量
 
 ### 🛠️ 故障排查
 

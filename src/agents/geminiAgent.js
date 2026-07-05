@@ -1,10 +1,12 @@
 const axios = require('axios');
+const { readTimeoutMs } = require('../utils/httpConfig');
 
 class GeminiAgent {
   constructor() {
     this.apiKey = process.env.GEMINI_API_KEY;
     this.model = process.env.GEMINI_MODEL || 'gemini-pro';
     this.baseURL = 'https://generativelanguage.googleapis.com/v1beta';
+    this.timeoutMs = readTimeoutMs('GEMINI_API_TIMEOUT_MS', 180000);
   }
 
   async chat(messages, systemPrompt = '') {
@@ -41,7 +43,7 @@ class GeminiAgent {
           headers: {
             'Content-Type': 'application/json'
           },
-          timeout: 60000
+          timeout: this.timeoutMs
         }
       );
 
@@ -53,7 +55,7 @@ class GeminiAgent {
   }
 
   buildChallengerPrompt(context) {
-    const { brief, current } = context;
+    const { brief, decisions, current, review, recentTranscript } = context;
 
     let prompt = `你是技术方案的挑战者（Challenger）。你的任务是从不同角度质疑方案的合理性，提出尖锐但建设性的问题。\n\n`;
 
@@ -61,8 +63,20 @@ class GeminiAgent {
       prompt += `【项目背景】\n${brief}\n\n`;
     }
 
+    if (decisions && decisions.length > 0) {
+      prompt += `【已确认决策】\n${decisions.slice(-10).join('\n')}\n\n`;
+    }
+
     if (current) {
       prompt += `【待挑战方案】\n${current}\n\n`;
+    }
+
+    if (review) {
+      prompt += `【已有 Review】\n${review}\n\n`;
+    }
+
+    if (recentTranscript) {
+      prompt += `【最近对话摘录】\n${recentTranscript}\n\n`;
     }
 
     prompt += `请从以下角度挑战：

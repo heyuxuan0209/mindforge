@@ -9,6 +9,7 @@ class MessageHandler {
     this.claudeAgent = new ClaudeAgent();
     this.codexAgent = new CodexAgent();
     this.geminiAgent = new GeminiAgent();
+    this.conversationHistory = [];
   }
 
   // 解析消息，识别 @ 的 Bot
@@ -70,6 +71,13 @@ class MessageHandler {
       // 检查是否需要更新文档
       await this.analyzeAndUpdateDocs(response, bot);
 
+      this.conversationHistory.push({
+        timestamp: new Date().toISOString(),
+        agent: bot,
+        user: userMessage,
+        response,
+      });
+
     } catch (error) {
       console.error('处理消息失败:', error);
       const errorText = `❌ 处理失败: ${error.message}`;
@@ -83,12 +91,16 @@ class MessageHandler {
 
   async handleClaude(userMessage, context) {
     const systemPrompt = this.claudeAgent.buildSystemPrompt(context);
-    const messages = [{ role: 'user', content: userMessage }];
+    const messages = this.buildMessages(userMessage);
     return await this.claudeAgent.chat(messages, systemPrompt);
   }
 
   async handleCodex(userMessage, context) {
-    const systemPrompt = this.codexAgent.buildReviewerPrompt(context);
+    const systemPrompt = this.codexAgent.buildReviewerPrompt(context, {
+      userMessage,
+      previousClaudeResponse: this.getLatestResponse('claude'),
+      recentTranscript: this.buildRecentTranscript(),
+    });
     const messages = [{ role: 'user', content: userMessage }];
     return await this.codexAgent.chat(messages, systemPrompt);
   }
@@ -117,10 +129,44 @@ class MessageHandler {
     }
 
     // 如果是 Review 输出，更新 review.md
-    if (bot === 'codex' && response.includes('[S0]') || response.includes('[S1]')) {
+    if (bot === 'codex' && (response.includes('[S0]') || response.includes('[S1]'))) {
       console.log('检测到 Review 问题，建议更新 review.md');
       await this.contextManager.updateContext('review', response);
     }
+  }
+
+  buildMessages(userMessage) {
+    const transcript = this.buildRecentTranscript();
+    if (!transcript) {
+      return [{ role: 'user', content: userMessage }];
+    }
+
+    return [
+      { role: 'user', content: transcript },
+      { role: 'user', content: userMessage }
+    ];
+  }
+
+  buildRecentTranscript(limit = 6) {
+    const entries = this.conversationHistory.slice(-limit);
+    if (entries.length === 0) return '';
+
+    return entries
+      .map((entry) => {
+        const label = entry.agent.toUpperCase();
+        return `[${label}] 用户: ${entry.user}\n[${label}] 回复: ${entry.response}`;
+      })
+      .join('\n\n');
+  }
+
+  getLatestResponse(agentName) {
+    for (let i = this.conversationHistory.length - 1; i >= 0; i -= 1) {
+      const entry = this.conversationHistory[i];
+      if (entry.agent === agentName && entry.response) {
+        return entry.response;
+      }
+    }
+    return '';
   }
 }
 
