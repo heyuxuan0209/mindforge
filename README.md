@@ -274,14 +274,6 @@ curl -X POST $CODEX_BASE_URL/chat/completions \
   -d '{"model":"gpt-4","messages":[{"role":"user","content":"test"}],"max_tokens":10}'
 ```
 
-### 📝 License
-
-MIT
-
-### 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 ---
 
 <a name="chinese"></a>
@@ -546,17 +538,34 @@ curl -X POST $CODEX_BASE_URL/chat/completions \
   -d '{"model":"gpt-4","messages":[{"role":"user","content":"test"}],"max_tokens":10}'
 ```
 
-### 📝 开源协议
+## 🔗 关注我 · Follow me
 
-MIT
+边做 AI 产品边把一手经验和思考公开分享，欢迎关注、来聊。<br>
+I build AI products in public and share the notes here — come say hi:
 
-### 🤝 贡献
+<table>
+  <tr>
+    <td align="center"><b>小红书 · Xiaohongshu</b></td>
+    <td align="center"><b>公众号 · WeChat</b></td>
+    <td align="center"><b>抖音 · Douyin</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/qr-xiaohongshu.jpg" width="210" alt="小红书 杰西卡"></td>
+    <td align="center"><img src="assets/qr-wechat.jpg" width="180" alt="公众号 杰西卡聊AI"></td>
+    <td align="center"><img src="assets/qr-douyin.jpg" width="210" alt="抖音 杰西卡"></td>
+  </tr>
+  <tr>
+    <td align="center">杰西卡 · 小红书号 <code>111013749</code></td>
+    <td align="center">搜「<b>杰西卡聊AI</b>」关注</td>
+    <td align="center">@杰西卡 · 抖音号 <code>2179932674</code></td>
+  </tr>
+</table>
 
-欢迎贡献！请随时提交 Pull Request。
+## License & 二开须知 · Contributing
 
-### 🙏 致谢
+MIT — 见 [LICENSE](LICENSE)。欢迎 **Star / Fork / Issue**，也欢迎二次开发、魔改、接进你自己的产品或工作流。**唯一的请求**：二开或转载时**注明出处**，并 **@ 一下我**（公众号 / 小红书「**杰西卡聊AI**」）——让顺着来的人能找到源头，就是最好的感谢 🙏。
 
-感谢所有使用和贡献本项目的开发者。
+MIT licensed — see [LICENSE](LICENSE). **Star / Fork / Issues welcome**, and feel free to remix, modify, or build it into your own product or workflow. **One ask:** if you fork/remix or repost, please **credit the source and @ me** (Jessica · 杰西卡聊AI). That's the best thank-you 🙏.
 
 ---
 
